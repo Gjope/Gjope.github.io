@@ -1,1 +1,237 @@
-Hello World B
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Temperature Converter</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f8fafc;
+        color: #0f172a;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+        padding: 1.5rem;
+      }
+
+      main {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 18px;
+        box-shadow: 0 20px 45px rgba(15, 23, 42, 0.15);
+        max-width: 440px;
+        width: 100%;
+        padding: 2rem 2.5rem;
+      }
+
+      h1 {
+        margin-top: 0;
+        margin-bottom: 0.5rem;
+        font-size: 2rem;
+        text-align: center;
+        color: #0f172a;
+      }
+
+      p.description {
+        margin-top: 0;
+        margin-bottom: 2rem;
+        text-align: center;
+        color: #475569;
+      }
+
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+      }
+
+      label {
+        font-weight: 600;
+        color: #1e293b;
+      }
+
+      input[type="number"] {
+        padding: 0.75rem 1rem;
+        font-size: 1.1rem;
+        border-radius: 10px;
+        border: 1px solid #cbd5f5;
+        background-color: #f8fafc;
+        color: #0f172a;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      input[type="number"]:focus {
+        border-color: #38bdf8;
+        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.3);
+        outline: none;
+      }
+
+      .actions {
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      button {
+        border: none;
+        background: #38bdf8;
+        color: white;
+        padding: 0.65rem 1.25rem;
+        border-radius: 999px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.2s ease, transform 0.2s ease;
+      }
+
+      button:hover {
+        background: #0ea5e9;
+        transform: translateY(-1px);
+      }
+
+      button:active {
+        transform: translateY(0);
+      }
+
+      .message {
+        min-height: 1.5rem;
+        margin-top: 1rem;
+        font-size: 0.95rem;
+        color: #ef4444;
+        text-align: center;
+      }
+
+      @media (max-width: 480px) {
+        main {
+          padding: 1.75rem 1.5rem;
+        }
+
+        h1 {
+          font-size: 1.7rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Temperature Converter</h1>
+      <p class="description">
+        Enter a value in either field to see the temperature converted instantly.
+      </p>
+      <form id="converter-form" novalidate>
+        <div class="field">
+          <label for="celsius">Celsius (&deg;C)</label>
+          <input
+            id="celsius"
+            name="celsius"
+            type="number"
+            step="any"
+            inputmode="decimal"
+            placeholder="0"
+            aria-describedby="message"
+          />
+        </div>
+        <div class="field">
+          <label for="fahrenheit">Fahrenheit (&deg;F)</label>
+          <input
+            id="fahrenheit"
+            name="fahrenheit"
+            type="number"
+            step="any"
+            inputmode="decimal"
+            placeholder="32"
+            aria-describedby="message"
+          />
+        </div>
+        <div class="actions">
+          <button type="button" id="clear">Clear</button>
+        </div>
+        <p class="message" id="message" aria-live="polite"></p>
+      </form>
+    </main>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const celsiusInput = document.getElementById("celsius");
+        const fahrenheitInput = document.getElementById("fahrenheit");
+        const clearButton = document.getElementById("clear");
+        const message = document.getElementById("message");
+        let isUpdating = false;
+
+        const roundToTwo = (value) => Math.round(value * 100) / 100;
+
+        const showMessage = (text = "") => {
+          message.textContent = text;
+        };
+
+        const convertFromCelsius = () => {
+          if (isUpdating) return;
+          const value = celsiusInput.value.trim();
+          if (value === "") {
+            isUpdating = true;
+            fahrenheitInput.value = "";
+            isUpdating = false;
+            showMessage();
+            return;
+          }
+
+          const celsius = Number(value);
+          if (!Number.isFinite(celsius)) {
+            showMessage("Please enter a valid number for Celsius.");
+            return;
+          }
+
+          isUpdating = true;
+          const fahrenheit = celsius * (9 / 5) + 32;
+          fahrenheitInput.value = roundToTwo(fahrenheit);
+          isUpdating = false;
+          showMessage();
+        };
+
+        const convertFromFahrenheit = () => {
+          if (isUpdating) return;
+          const value = fahrenheitInput.value.trim();
+          if (value === "") {
+            isUpdating = true;
+            celsiusInput.value = "";
+            isUpdating = false;
+            showMessage();
+            return;
+          }
+
+          const fahrenheit = Number(value);
+          if (!Number.isFinite(fahrenheit)) {
+            showMessage("Please enter a valid number for Fahrenheit.");
+            return;
+          }
+
+          isUpdating = true;
+          const celsius = (fahrenheit - 32) * (5 / 9);
+          celsiusInput.value = roundToTwo(celsius);
+          isUpdating = false;
+          showMessage();
+        };
+
+        const clearForm = () => {
+          isUpdating = true;
+          celsiusInput.value = "";
+          fahrenheitInput.value = "";
+          isUpdating = false;
+          celsiusInput.focus();
+          showMessage("Values cleared.");
+          setTimeout(() => showMessage(), 1500);
+        };
+
+        celsiusInput.addEventListener("input", convertFromCelsius);
+        fahrenheitInput.addEventListener("input", convertFromFahrenheit);
+        clearButton.addEventListener("click", clearForm);
+      });
+    </script>
+  </body>
+</html>
