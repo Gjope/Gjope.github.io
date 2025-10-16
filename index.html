@@ -2,236 +2,414 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Temperature Converter</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Gjope's Toolbox</title>
     <style>
       :root {
         color-scheme: light dark;
         font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-        background-color: #f8fafc;
-        color: #0f172a;
+        --bg: radial-gradient(circle at top, #0f172a 0%, #020617 60%);
+        --card-bg: rgba(15, 23, 42, 0.82);
+        --card-bg-light: rgba(248, 250, 252, 0.9);
+        --text-main: #f8fafc;
+        --text-muted: rgba(226, 232, 240, 0.8);
+        --accent: #38bdf8;
+        --accent-strong: #0ea5e9;
+      }
+
+      @media (prefers-color-scheme: light) {
+        :root {
+          --bg: radial-gradient(circle at top, #e0f2fe 0%, #f8fafc 60%);
+          --card-bg: rgba(248, 250, 252, 0.92);
+          --card-bg-light: rgba(255, 255, 255, 0.9);
+          --text-main: #0f172a;
+          --text-muted: #475569;
+        }
       }
 
       body {
         margin: 0;
         min-height: 100vh;
         display: flex;
-        align-items: center;
-        justify-content: center;
-        background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
-        padding: 1.5rem;
-      }
-
-      main {
-        background: rgba(255, 255, 255, 0.9);
-        border-radius: 18px;
-        box-shadow: 0 20px 45px rgba(15, 23, 42, 0.15);
-        max-width: 440px;
-        width: 100%;
-        padding: 2rem 2.5rem;
-      }
-
-      h1 {
-        margin-top: 0;
-        margin-bottom: 0.5rem;
-        font-size: 2rem;
-        text-align: center;
-        color: #0f172a;
-      }
-
-      p.description {
-        margin-top: 0;
-        margin-bottom: 2rem;
-        text-align: center;
-        color: #475569;
-      }
-
-      .field {
-        display: flex;
         flex-direction: column;
-        gap: 0.5rem;
-        margin-bottom: 1.5rem;
+        background: var(--bg);
+        color: var(--text-main);
       }
 
-      label {
-        font-weight: 600;
-        color: #1e293b;
+      header {
+        padding: clamp(2.5rem, 6vw, 4rem) 1.5rem 2rem;
+        text-align: center;
       }
 
-      input[type="number"] {
-        padding: 0.75rem 1rem;
+      header h1 {
+        margin: 0;
+        font-size: clamp(2.4rem, 5vw, 3.4rem);
+        letter-spacing: -0.01em;
+      }
+
+      header p {
+        margin: 1rem auto 2.5rem;
+        max-width: 720px;
         font-size: 1.1rem;
-        border-radius: 10px;
-        border: 1px solid #cbd5f5;
-        background-color: #f8fafc;
-        color: #0f172a;
-        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        line-height: 1.7;
+        color: var(--text-muted);
       }
 
-      input[type="number"]:focus {
-        border-color: #38bdf8;
-        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.3);
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        justify-content: center;
+        margin: 0 auto;
+        padding: 0 1.5rem 1rem;
+        max-width: 960px;
+      }
+
+      .controls label {
+        flex: 1 1 260px;
+        display: flex;
+        align-items: center;
+        background: var(--card-bg-light);
+        border-radius: 999px;
+        padding: 0.35rem 1.1rem;
+        box-shadow: 0 15px 35px rgba(15, 23, 42, 0.28);
+      }
+
+      .controls span {
+        color: var(--text-muted);
+        font-weight: 600;
+        font-size: 0.95rem;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+      }
+
+      .controls input[type="search"],
+      .controls select {
+        appearance: none;
+        border: none;
+        background: transparent;
+        color: inherit;
+        font: inherit;
+        width: 100%;
+        padding: 0.4rem 0.6rem;
         outline: none;
       }
 
-      .actions {
-        display: flex;
-        justify-content: flex-end;
-      }
-
-      button {
-        border: none;
-        background: #38bdf8;
-        color: white;
-        padding: 0.65rem 1.25rem;
-        border-radius: 999px;
-        font-size: 1rem;
-        font-weight: 600;
+      .controls select {
         cursor: pointer;
-        transition: background-color 0.2s ease, transform 0.2s ease;
       }
 
-      button:hover {
-        background: #0ea5e9;
-        transform: translateY(-1px);
+      main {
+        flex: 1;
+        width: 100%;
       }
 
-      button:active {
-        transform: translateY(0);
+      .tools-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: clamp(1rem, 2vw, 1.5rem);
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1.5rem 3rem;
+        list-style: none;
       }
 
-      .message {
-        min-height: 1.5rem;
-        margin-top: 1rem;
-        font-size: 0.95rem;
-        color: #ef4444;
-        text-align: center;
+      .tool-card {
+        background: var(--card-bg);
+        border-radius: 20px;
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.85rem;
+        box-shadow: 0 24px 55px rgba(15, 23, 42, 0.55);
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+        position: relative;
+        overflow: hidden;
       }
 
-      @media (max-width: 480px) {
-        main {
-          padding: 1.75rem 1.5rem;
+      .tool-card::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(56, 189, 248, 0.08), transparent 60%);
+        pointer-events: none;
+      }
+
+      .tool-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 30px 65px rgba(8, 47, 73, 0.65);
+      }
+
+      .tool-card h2 {
+        margin: 0;
+        font-size: 1.25rem;
+      }
+
+      .tool-card p {
+        margin: 0;
+        color: var(--text-muted);
+        line-height: 1.5;
+        font-size: 0.98rem;
+      }
+
+      .tool-meta {
+        display: flex;
+        gap: 0.4rem;
+        flex-wrap: wrap;
+      }
+
+      .tool-tag {
+        background: rgba(56, 189, 248, 0.15);
+        border: 1px solid rgba(14, 165, 233, 0.35);
+        color: #bae6fd;
+        border-radius: 999px;
+        padding: 0.2rem 0.75rem;
+        font-size: 0.78rem;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+      }
+
+      @media (prefers-color-scheme: light) {
+        .tool-card {
+          background: var(--card-bg-light);
+          box-shadow: 0 24px 45px rgba(15, 23, 42, 0.18);
         }
 
-        h1 {
-          font-size: 1.7rem;
+        .tool-card:hover {
+          box-shadow: 0 26px 60px rgba(15, 23, 42, 0.24);
+        }
+
+        .tool-tag {
+          background: rgba(14, 165, 233, 0.12);
+          border-color: rgba(14, 165, 233, 0.2);
+          color: #0369a1;
+        }
+      }
+
+      .tool-card a {
+        margin-top: auto;
+        align-self: flex-start;
+        background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+        color: white;
+        padding: 0.6rem 1.25rem;
+        border-radius: 999px;
+        text-decoration: none;
+        font-weight: 600;
+        letter-spacing: 0.03em;
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+      }
+
+      .tool-card a:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 16px 30px rgba(14, 165, 233, 0.35);
+      }
+
+      .summary {
+        text-align: center;
+        margin: 1rem auto 2rem;
+        color: var(--text-muted);
+        font-size: 0.95rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .empty-state {
+        text-align: center;
+        color: var(--text-muted);
+        padding: 3rem 1.5rem;
+        font-size: 1rem;
+      }
+
+      footer {
+        padding: 1.5rem;
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+      }
+
+      @media (max-width: 640px) {
+        header {
+          padding-top: 2.75rem;
+        }
+
+        .controls label {
+          flex-basis: 100%;
         }
       }
     </style>
   </head>
   <body>
-    <main>
-      <h1>Temperature Converter</h1>
-      <p class="description">
-        Enter a value in either field to see the temperature converted instantly.
+    <header>
+      <h1>Gjope's Handy Toolbox</h1>
+      <p>
+        Browse, search, and launch focused utilities built for everyday conversions
+        and calculations. The catalog grows without the layout breaking — whether
+        you need two tools or two hundred.
       </p>
-      <form id="converter-form" novalidate>
-        <div class="field">
-          <label for="celsius">Celsius (&deg;C)</label>
-          <input
-            id="celsius"
-            name="celsius"
-            type="number"
-            step="any"
-            inputmode="decimal"
-            placeholder="0"
-            aria-describedby="message"
-          />
-        </div>
-        <div class="field">
-          <label for="fahrenheit">Fahrenheit (&deg;F)</label>
-          <input
-            id="fahrenheit"
-            name="fahrenheit"
-            type="number"
-            step="any"
-            inputmode="decimal"
-            placeholder="32"
-            aria-describedby="message"
-          />
-        </div>
-        <div class="actions">
-          <button type="button" id="clear">Clear</button>
-        </div>
-        <p class="message" id="message" aria-live="polite"></p>
-      </form>
+    </header>
+    <section class="controls" aria-label="Tool filters">
+      <label>
+        <span>Search</span>
+        <input
+          id="search"
+          type="search"
+          name="search"
+          placeholder="Find a tool by name or description"
+          autocomplete="off"
+          spellcheck="false"
+          aria-describedby="results"
+        />
+      </label>
+      <label>
+        <span>Category</span>
+        <select id="category" name="category" aria-describedby="results">
+          <option value="all">All tools</option>
+          <option value="conversion">Conversions</option>
+          <option value="finance">Finance</option>
+          <option value="data">Data</option>
+          <option value="time">Time</option>
+        </select>
+      </label>
+      <label>
+        <span>Sort</span>
+        <select id="sort" name="sort" aria-describedby="results">
+          <option value="az">A → Z</option>
+          <option value="za">Z → A</option>
+          <option value="newest">Newest</option>
+        </select>
+      </label>
+    </section>
+    <p class="summary" id="results" role="status" aria-live="polite"></p>
+    <main>
+      <ul id="tools" class="tools-grid"></ul>
+      <div id="empty" class="empty-state" hidden>
+        No tools match the current filters. Try adjusting the search or category
+        selection.
+      </div>
     </main>
+    <footer>&copy; <span id="year"></span> Gjope. All rights reserved.</footer>
     <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        const celsiusInput = document.getElementById("celsius");
-        const fahrenheitInput = document.getElementById("fahrenheit");
-        const clearButton = document.getElementById("clear");
-        const message = document.getElementById("message");
-        let isUpdating = false;
+      const tools = [
+        {
+          id: "temperature-converter",
+          title: "Temperature Converter",
+          description:
+            "Translate between Celsius and Fahrenheit instantly with inline validation and quick clearing when you need a fresh start.",
+          href: "/tools/temperature-converter.html",
+          tags: ["conversion"],
+          category: "conversion",
+          createdAt: "2024-01-10",
+        },
+        {
+          id: "time-zone-converter",
+          title: "Epoch & Time Zone Converter",
+          description:
+            "Convert Unix epoch values into human-friendly dates across popular time zones and copy any result with a tap.",
+          href: "/tools/time-zone-converter.html",
+          tags: ["time", "conversion"],
+          category: "time",
+          createdAt: "2024-01-12",
+        },
+        {
+          id: "json-visualizer",
+          title: "JSON Visualizer",
+          description:
+            "Paste JSON to explore a color-coded, collapsible tree with validation feedback and quick formatting helpers.",
+          href: "/tools/json-visualizer.html",
+          tags: ["data"],
+          category: "data",
+          createdAt: "2024-02-02",
+        },
+        {
+          id: "currency-converter",
+          title: "Currency Converter",
+          description:
+            "Convert between the most common currencies with live rate math, swap support, and handy preset shortcuts.",
+          href: "/tools/currency-converter.html",
+          tags: ["finance", "conversion"],
+          category: "finance",
+          createdAt: "2024-02-05",
+        },
+        {
+          id: "mortgage-calculator",
+          title: "Mortgage Amortization Calculator",
+          description:
+            "Build a month-by-month amortization schedule, view payoff totals, and download the numbers for deeper planning.",
+          href: "/tools/mortgage-calculator.html",
+          tags: ["finance"],
+          category: "finance",
+          createdAt: "2024-02-08",
+        },
+      ];
 
-        const roundToTwo = (value) => Math.round(value * 100) / 100;
+      const toolsList = document.getElementById("tools");
+      const emptyState = document.getElementById("empty");
+      const summary = document.getElementById("results");
+      const searchInput = document.getElementById("search");
+      const categorySelect = document.getElementById("category");
+      const sortSelect = document.getElementById("sort");
 
-        const showMessage = (text = "") => {
-          message.textContent = text;
-        };
+      const template = (tool) => {
+        const li = document.createElement("li");
+        li.className = "tool-card";
+        li.innerHTML = `
+          <h2>${tool.title}</h2>
+          <p>${tool.description}</p>
+          <div class="tool-meta">
+            ${tool.tags.map((tag) => `<span class="tool-tag">${tag}</span>`).join("")}
+          </div>
+          <a href="${tool.href}">Open tool</a>
+        `;
+        return li;
+      };
 
-        const convertFromCelsius = () => {
-          if (isUpdating) return;
-          const value = celsiusInput.value.trim();
-          if (value === "") {
-            isUpdating = true;
-            fahrenheitInput.value = "";
-            isUpdating = false;
-            showMessage();
-            return;
+      const formatCount = (count) => {
+        if (count === tools.length) {
+          return `${count} tool${count === 1 ? "" : "s"} available`;
+        }
+        return `${count} of ${tools.length} tool${tools.length === 1 ? "" : "s"} shown`;
+      };
+
+      const applyFilters = () => {
+        const term = searchInput.value.trim().toLowerCase();
+        const category = categorySelect.value;
+        const sort = sortSelect.value;
+
+        let filtered = tools.filter((tool) => {
+          const matchesCategory = category === "all" || tool.category === category;
+          const matchesSearch =
+            !term ||
+            tool.title.toLowerCase().includes(term) ||
+            tool.description.toLowerCase().includes(term) ||
+            tool.tags.some((tag) => tag.toLowerCase().includes(term));
+          return matchesCategory && matchesSearch;
+        });
+
+        filtered.sort((a, b) => {
+          if (sort === "az") {
+            return a.title.localeCompare(b.title);
           }
-
-          const celsius = Number(value);
-          if (!Number.isFinite(celsius)) {
-            showMessage("Please enter a valid number for Celsius.");
-            return;
+          if (sort === "za") {
+            return b.title.localeCompare(a.title);
           }
-
-          isUpdating = true;
-          const fahrenheit = celsius * (9 / 5) + 32;
-          fahrenheitInput.value = roundToTwo(fahrenheit);
-          isUpdating = false;
-          showMessage();
-        };
-
-        const convertFromFahrenheit = () => {
-          if (isUpdating) return;
-          const value = fahrenheitInput.value.trim();
-          if (value === "") {
-            isUpdating = true;
-            celsiusInput.value = "";
-            isUpdating = false;
-            showMessage();
-            return;
+          if (sort === "newest") {
+            return new Date(b.createdAt) - new Date(a.createdAt);
           }
+          return 0;
+        });
 
-          const fahrenheit = Number(value);
-          if (!Number.isFinite(fahrenheit)) {
-            showMessage("Please enter a valid number for Fahrenheit.");
-            return;
-          }
+        toolsList.replaceChildren(...filtered.map(template));
+        summary.textContent = formatCount(filtered.length);
+        emptyState.hidden = filtered.length !== 0;
+      };
 
-          isUpdating = true;
-          const celsius = (fahrenheit - 32) * (5 / 9);
-          celsiusInput.value = roundToTwo(celsius);
-          isUpdating = false;
-          showMessage();
-        };
+      searchInput.addEventListener("input", applyFilters);
+      [categorySelect, sortSelect].forEach((control) =>
+        control.addEventListener("change", applyFilters)
+      );
 
-        const clearForm = () => {
-          isUpdating = true;
-          celsiusInput.value = "";
-          fahrenheitInput.value = "";
-          isUpdating = false;
-          celsiusInput.focus();
-          showMessage("Values cleared.");
-          setTimeout(() => showMessage(), 1500);
-        };
-
-        celsiusInput.addEventListener("input", convertFromCelsius);
-        fahrenheitInput.addEventListener("input", convertFromFahrenheit);
-        clearButton.addEventListener("click", clearForm);
-      });
+      applyFilters();
+      document.getElementById("year").textContent = new Date().getFullYear();
     </script>
   </body>
 </html>

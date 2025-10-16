@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mortgage Amortization Calculator</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: radial-gradient(circle at top, #1d2939 0%, #020617 70%);
+        color: #e2e8f0;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        padding: clamp(1.5rem, 3vw, 2.5rem);
+      }
+
+      main {
+        width: 100%;
+        max-width: 1100px;
+        margin: auto;
+        background: rgba(15, 23, 42, 0.82);
+        border-radius: 26px;
+        box-shadow: 0 40px 90px rgba(15, 23, 42, 0.65);
+        display: grid;
+        gap: 2rem;
+        padding: clamp(1.75rem, 4vw, 2.75rem);
+      }
+
+      .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        color: #38bdf8;
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      .back-link:hover {
+        text-decoration: underline;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(2.2rem, 4vw, 3rem);
+      }
+
+      p.description {
+        margin: 0;
+        color: rgba(226, 232, 240, 0.78);
+        line-height: 1.7;
+      }
+
+      form {
+        display: grid;
+        gap: 1.25rem;
+      }
+
+      .grid {
+        display: grid;
+        gap: 1.25rem;
+        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      }
+
+      label {
+        display: grid;
+        gap: 0.45rem;
+        font-weight: 600;
+        color: rgba(241, 245, 249, 0.88);
+      }
+
+      input {
+        border-radius: 14px;
+        border: 1px solid rgba(56, 189, 248, 0.35);
+        background: rgba(15, 23, 42, 0.85);
+        color: inherit;
+        font: inherit;
+        padding: 0.75rem 1rem;
+      }
+
+      input:focus {
+        outline: none;
+        border-color: rgba(56, 189, 248, 0.65);
+        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25);
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+      }
+
+      button {
+        border: none;
+        border-radius: 999px;
+        padding: 0.7rem 1.6rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+      }
+
+      button.primary {
+        background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+        color: white;
+        box-shadow: 0 22px 45px rgba(14, 165, 233, 0.35);
+      }
+
+      button.secondary {
+        background: rgba(148, 163, 184, 0.2);
+        color: #e2e8f0;
+        border: 1px solid rgba(148, 163, 184, 0.3);
+      }
+
+      button:hover {
+        transform: translateY(-1px);
+      }
+
+      .summary {
+        display: grid;
+        gap: 1.5rem;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      }
+
+      .summary-card {
+        background: rgba(15, 23, 42, 0.9);
+        border: 1px solid rgba(56, 189, 248, 0.2);
+        border-radius: 18px;
+        padding: 1.25rem 1.5rem;
+        display: grid;
+        gap: 0.35rem;
+      }
+
+      .summary-card span {
+        font-size: 0.9rem;
+        color: rgba(226, 232, 240, 0.65);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .summary-card strong {
+        font-size: clamp(1.7rem, 3vw, 2.3rem);
+      }
+
+      .schedule {
+        background: rgba(15, 23, 42, 0.9);
+        border-radius: 22px;
+        border: 1px solid rgba(56, 189, 248, 0.2);
+        overflow: hidden;
+      }
+
+      .schedule header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.25rem 1.5rem;
+        gap: 1rem;
+      }
+
+      .schedule table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .schedule th,
+      .schedule td {
+        padding: 0.65rem 0.9rem;
+        text-align: right;
+      }
+
+      .schedule th:first-child,
+      .schedule td:first-child {
+        text-align: left;
+      }
+
+      .schedule tbody tr:nth-child(odd) {
+        background: rgba(30, 41, 59, 0.8);
+      }
+
+      .schedule tbody tr:nth-child(even) {
+        background: rgba(15, 23, 42, 0.96);
+      }
+
+      .schedule footer {
+        padding: 1rem 1.5rem 1.5rem;
+        text-align: center;
+        color: rgba(226, 232, 240, 0.6);
+        font-size: 0.9rem;
+      }
+
+      @media (max-width: 720px) {
+        body {
+          padding: 1.25rem;
+        }
+
+        main {
+          border-radius: 22px;
+        }
+
+        .schedule table {
+          font-size: 0.85rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <a class="back-link" href="/">← Back to toolbox</a>
+      <div>
+        <h1>Mortgage Amortization Calculator</h1>
+        <p class="description">
+          See your loan's monthly payment, total interest, and payoff timeline.
+          Adjust down payments, rates, or start dates and instantly rebuild the
+          amortization schedule.
+        </p>
+      </div>
+      <form id="mortgage-form" novalidate>
+        <div class="grid">
+          <label>
+            Loan amount
+            <input
+              id="amount"
+              type="number"
+              inputmode="decimal"
+              min="0"
+              step="any"
+              value="350000"
+            />
+          </label>
+          <label>
+            Down payment
+            <input
+              id="down-payment"
+              type="number"
+              inputmode="decimal"
+              min="0"
+              step="any"
+              value="50000"
+            />
+          </label>
+          <label>
+            Interest rate (APR %)
+            <input
+              id="rate"
+              type="number"
+              inputmode="decimal"
+              min="0"
+              step="0.01"
+              value="4.5"
+            />
+          </label>
+          <label>
+            Term (years)
+            <input id="term" type="number" min="1" step="1" value="30" />
+          </label>
+          <label>
+            Start month
+            <input id="start" type="month" />
+          </label>
+        </div>
+        <div class="actions">
+          <button type="button" class="primary" id="calculate">Calculate</button>
+          <button type="button" class="secondary" id="clear">Clear</button>
+        </div>
+      </form>
+      <section class="summary" aria-label="Summary">
+        <div class="summary-card">
+          <span>Monthly payment</span>
+          <strong id="monthly">—</strong>
+        </div>
+        <div class="summary-card">
+          <span>Total interest</span>
+          <strong id="interest">—</strong>
+        </div>
+        <div class="summary-card">
+          <span>Total paid</span>
+          <strong id="total">—</strong>
+        </div>
+        <div class="summary-card">
+          <span>Payoff date</span>
+          <strong id="payoff">—</strong>
+        </div>
+      </section>
+      <section class="schedule" aria-label="Amortization schedule">
+        <header>
+          <h2>Amortization schedule</h2>
+          <button type="button" class="secondary" id="toggle">Show full schedule</button>
+        </header>
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Month</th>
+              <th scope="col">Payment</th>
+              <th scope="col">Principal</th>
+              <th scope="col">Interest</th>
+              <th scope="col">Balance</th>
+            </tr>
+          </thead>
+          <tbody id="schedule"></tbody>
+        </table>
+        <footer>Showing first 12 months by default to keep things snappy.</footer>
+      </section>
+    </main>
+    <script>
+      const amountInput = document.getElementById("amount");
+      const downPaymentInput = document.getElementById("down-payment");
+      const rateInput = document.getElementById("rate");
+      const termInput = document.getElementById("term");
+      const startInput = document.getElementById("start");
+      const calculateButton = document.getElementById("calculate");
+      const clearButton = document.getElementById("clear");
+      const toggleButton = document.getElementById("toggle");
+      const monthlyOutput = document.getElementById("monthly");
+      const interestOutput = document.getElementById("interest");
+      const totalOutput = document.getElementById("total");
+      const payoffOutput = document.getElementById("payoff");
+      const scheduleBody = document.getElementById("schedule");
+
+      let schedule = [];
+      let expanded = false;
+
+      const formatCurrency = (value) =>
+        new Intl.NumberFormat(undefined, {
+          style: "currency",
+          currency: "USD",
+          maximumFractionDigits: 2,
+        }).format(value);
+
+      const buildSchedule = (principal, annualRate, years, startDate) => {
+        const monthlyRate = annualRate / 100 / 12;
+        const totalPayments = years * 12;
+        const payment =
+          monthlyRate === 0
+            ? principal / totalPayments
+            : (principal * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -totalPayments));
+
+        const entries = [];
+        let balance = principal;
+        let currentDate = startDate ? new Date(startDate) : new Date();
+        currentDate.setDate(1);
+
+        for (let i = 0; i < totalPayments; i += 1) {
+          const interest = balance * monthlyRate;
+          const principalPaid = Math.min(balance, payment - interest);
+          balance = Math.max(0, balance - principalPaid);
+          const entry = {
+            index: i + 1,
+            date: new Date(currentDate),
+            payment,
+            principal: principalPaid,
+            interest,
+            balance,
+          };
+          entries.push(entry);
+          currentDate.setMonth(currentDate.getMonth() + 1);
+        }
+
+        return { entries, payment };
+      };
+
+      const renderSchedule = () => {
+        const rows = (expanded ? schedule : schedule.slice(0, 12)).map((entry) => {
+          const dateLabel = entry.date
+            ? entry.date.toLocaleDateString(undefined, {
+                month: "short",
+                year: "numeric",
+              })
+            : `Month ${entry.index}`;
+          return `
+            <tr>
+              <td>${entry.index}. ${dateLabel}</td>
+              <td>${formatCurrency(entry.payment)}</td>
+              <td>${formatCurrency(entry.principal)}</td>
+              <td>${formatCurrency(entry.interest)}</td>
+              <td>${formatCurrency(entry.balance)}</td>
+            </tr>
+          `;
+        });
+        scheduleBody.innerHTML = rows.join("");
+        toggleButton.textContent = expanded ? "Show first year" : "Show full schedule";
+      };
+
+      const calculate = () => {
+        const amount = Number(amountInput.value);
+        const downPayment = Number(downPaymentInput.value) || 0;
+        const rate = Number(rateInput.value);
+        const years = Number(termInput.value);
+
+        if (![amount, rate, years].every((value) => Number.isFinite(value) && value >= 0)) {
+          monthlyOutput.textContent = "Check your inputs.";
+          interestOutput.textContent = "—";
+          totalOutput.textContent = "—";
+          payoffOutput.textContent = "—";
+          scheduleBody.innerHTML = "";
+          return;
+        }
+
+        const principal = Math.max(0, amount - downPayment);
+        const startDate = startInput.value ? `${startInput.value}-01` : undefined;
+        const { entries, payment } = buildSchedule(principal, rate, years, startDate);
+        schedule = entries;
+        const totalPaid = payment * entries.length;
+        const totalInterest = totalPaid - principal;
+        const payoffDate = entries.at(-1)?.date;
+
+        monthlyOutput.textContent = formatCurrency(payment);
+        interestOutput.textContent = formatCurrency(totalInterest);
+        totalOutput.textContent = formatCurrency(totalPaid);
+        payoffOutput.textContent = payoffDate
+          ? payoffDate.toLocaleDateString(undefined, { month: "long", year: "numeric" })
+          : `Month ${entries.length}`;
+        expanded = false;
+        renderSchedule();
+      };
+
+      const clear = () => {
+        amountInput.value = "";
+        downPaymentInput.value = "";
+        rateInput.value = "";
+        termInput.value = "";
+        startInput.value = "";
+        monthlyOutput.textContent = "—";
+        interestOutput.textContent = "—";
+        totalOutput.textContent = "—";
+        payoffOutput.textContent = "—";
+        schedule = [];
+        scheduleBody.innerHTML = "";
+      };
+
+      calculateButton.addEventListener("click", calculate);
+      clearButton.addEventListener("click", clear);
+      toggleButton.addEventListener("click", () => {
+        if (!schedule.length) return;
+        expanded = !expanded;
+        renderSchedule();
+      });
+
+      document.getElementById("mortgage-form").addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          calculate();
+        }
+      });
+
+      calculate();
+    </script>
+  </body>
+</html>

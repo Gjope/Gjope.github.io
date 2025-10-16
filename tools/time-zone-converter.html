@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Epoch &amp; Time Zone Converter</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #ede9fe, #e0f2fe);
+        padding: 1.5rem;
+      }
+
+      main {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 18px;
+        box-shadow: 0 24px 55px rgba(76, 29, 149, 0.18);
+        max-width: 520px;
+        width: 100%;
+        padding: 2.25rem 2.5rem;
+        color: #1f2937;
+      }
+
+      .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        margin-bottom: 1.25rem;
+        color: #7c3aed;
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      .back-link:hover {
+        text-decoration: underline;
+      }
+
+      h1 {
+        margin: 0 0 0.5rem;
+        font-size: clamp(1.9rem, 4vw, 2.4rem);
+        text-align: center;
+        color: #312e81;
+      }
+
+      p.description {
+        margin: 0 0 1.75rem;
+        text-align: center;
+        color: #4c1d95;
+        line-height: 1.6;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+
+      label {
+        font-weight: 600;
+        color: #312e81;
+        display: block;
+        margin-bottom: 0.5rem;
+      }
+
+      input[type="number"],
+      select {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        font-size: 1.05rem;
+        border-radius: 12px;
+        border: 1px solid rgba(79, 70, 229, 0.2);
+        background-color: rgba(248, 250, 252, 0.9);
+        color: #1f2937;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      input[type="number"]:focus,
+      select:focus {
+        border-color: #7c3aed;
+        box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+        outline: none;
+      }
+
+      .inline-group {
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: 1fr minmax(120px, 0.7fr);
+      }
+
+      .actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+      }
+
+      button {
+        border: none;
+        border-radius: 999px;
+        padding: 0.6rem 1.3rem;
+        font-size: 0.95rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      button.primary {
+        background: linear-gradient(135deg, #7c3aed, #6366f1);
+        color: white;
+        box-shadow: 0 14px 25px rgba(99, 102, 241, 0.25);
+      }
+
+      button.secondary {
+        background: rgba(99, 102, 241, 0.12);
+        color: #312e81;
+      }
+
+      button:hover {
+        transform: translateY(-1px);
+      }
+
+      .message {
+        min-height: 1.5rem;
+        font-size: 0.9rem;
+        color: #dc2626;
+        text-align: center;
+      }
+
+      .results {
+        margin-top: 1rem;
+        background: rgba(248, 250, 252, 0.8);
+        border-radius: 16px;
+        padding: 1.5rem;
+        border: 1px solid rgba(99, 102, 241, 0.15);
+      }
+
+      .results h2 {
+        margin: 0 0 1rem;
+        font-size: 1.15rem;
+        color: #312e81;
+        text-align: center;
+      }
+
+      dl {
+        display: grid;
+        grid-template-columns: minmax(120px, 1fr) 2fr;
+        gap: 0.75rem 1.25rem;
+        margin: 0;
+      }
+
+      dt {
+        font-weight: 600;
+        color: #4338ca;
+      }
+
+      dd {
+        margin: 0;
+        color: #1f2937;
+        word-break: break-word;
+      }
+
+      @media (max-width: 540px) {
+        main {
+          padding: 1.9rem 1.5rem;
+        }
+
+        .inline-group {
+          grid-template-columns: 1fr;
+        }
+
+        .actions {
+          justify-content: center;
+        }
+
+        dl {
+          grid-template-columns: 1fr;
+        }
+
+        dt {
+          color: #312e81;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <a class="back-link" href="/"><span aria-hidden="true">←</span> Back to toolbox</a>
+      <h1>Epoch &amp; Time Zone Converter</h1>
+      <p class="description">
+        Paste in a Unix epoch value and explore how it looks in different time zones.
+        Switch between seconds and milliseconds, then copy the formatted result you
+        need.
+      </p>
+      <form id="converter" novalidate>
+        <div>
+          <label for="epoch">Epoch value</label>
+          <div class="inline-group">
+            <input
+              id="epoch"
+              name="epoch"
+              type="number"
+              inputmode="numeric"
+              placeholder="e.g. 1704067200"
+              aria-describedby="message"
+            />
+            <select id="unit" name="unit">
+              <option value="seconds">Seconds</option>
+              <option value="milliseconds">Milliseconds</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label for="timezone">Time zone</label>
+          <select id="timezone" name="timezone">
+            <option value="UTC">UTC</option>
+            <option value="America/New_York">America/New_York (Eastern)</option>
+            <option value="America/Los_Angeles">America/Los_Angeles (Pacific)</option>
+            <option value="Europe/London">Europe/London</option>
+            <option value="Europe/Paris">Europe/Paris</option>
+            <option value="Asia/Tokyo">Asia/Tokyo</option>
+            <option value="Australia/Sydney">Australia/Sydney</option>
+            <option value="Asia/Kolkata">Asia/Kolkata</option>
+          </select>
+        </div>
+        <div class="actions">
+          <button type="button" class="secondary" id="copy">Copy formatted time</button>
+          <button type="button" class="primary" id="now">Use current time</button>
+        </div>
+        <p class="message" id="message" aria-live="polite"></p>
+      </form>
+      <section class="results" aria-live="polite" aria-atomic="true">
+        <h2>Converted times</h2>
+        <dl>
+          <dt>Selected zone</dt>
+          <dd id="selected-zone">—</dd>
+          <dt>UTC</dt>
+          <dd id="utc">—</dd>
+          <dt>Local time</dt>
+          <dd id="local">—</dd>
+          <dt>ISO 8601</dt>
+          <dd id="iso">—</dd>
+        </dl>
+      </section>
+    </main>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const epochInput = document.getElementById("epoch");
+        const unitSelect = document.getElementById("unit");
+        const timezoneSelect = document.getElementById("timezone");
+        const message = document.getElementById("message");
+        const nowButton = document.getElementById("now");
+        const copyButton = document.getElementById("copy");
+        const selectedZoneOutput = document.getElementById("selected-zone");
+        const utcOutput = document.getElementById("utc");
+        const localOutput = document.getElementById("local");
+        const isoOutput = document.getElementById("iso");
+
+        const formatterOptions = {
+          dateStyle: "full",
+          timeStyle: "long",
+        };
+
+        const formatWithZone = (ms, timeZone) => {
+          try {
+            return new Intl.DateTimeFormat(undefined, {
+              ...formatterOptions,
+              timeZone,
+            }).format(new Date(ms));
+          } catch (error) {
+            return "Unsupported time zone";
+          }
+        };
+
+        const formatUTC = (ms) =>
+          new Intl.DateTimeFormat(undefined, {
+            ...formatterOptions,
+            timeZone: "UTC",
+          }).format(new Date(ms));
+
+        const formatLocal = (ms) =>
+          new Intl.DateTimeFormat(undefined, formatterOptions).format(new Date(ms));
+
+        const formatISO = (ms) => new Date(ms).toISOString();
+
+        const showMessage = (text = "", isError = false) => {
+          message.textContent = text;
+          message.style.color = isError ? "#dc2626" : "#047857";
+        };
+
+        const parseEpoch = () => {
+          const raw = epochInput.value.trim();
+          if (!raw) {
+            clearOutputs();
+            showMessage();
+            return null;
+          }
+
+          const value = Number(raw);
+          if (!Number.isFinite(value)) {
+            showMessage("Please enter a valid numeric epoch value.", true);
+            return null;
+          }
+
+          const unit = unitSelect.value;
+          const epochMilliseconds = unit === "seconds" ? value * 1000 : value;
+
+          if (!Number.isFinite(epochMilliseconds)) {
+            showMessage("The provided epoch value is too large.", true);
+            return null;
+          }
+
+          return epochMilliseconds;
+        };
+
+        const updateOutputs = () => {
+          const epochMilliseconds = parseEpoch();
+          if (epochMilliseconds === null) {
+            return;
+          }
+
+          const selectedZone = timezoneSelect.value;
+          const selectedFormatted = formatWithZone(epochMilliseconds, selectedZone);
+          const utcFormatted = formatUTC(epochMilliseconds);
+          const localFormatted = formatLocal(epochMilliseconds);
+          const isoFormatted = formatISO(epochMilliseconds);
+
+          selectedZoneOutput.textContent = `${selectedFormatted} (${selectedZone})`;
+          utcOutput.textContent = utcFormatted;
+          localOutput.textContent = localFormatted;
+          isoOutput.textContent = isoFormatted;
+          showMessage("Converted successfully.", false);
+        };
+
+        const clearOutputs = () => {
+          selectedZoneOutput.textContent = "—";
+          utcOutput.textContent = "—";
+          localOutput.textContent = "—";
+          isoOutput.textContent = "—";
+        };
+
+        const useCurrentTime = () => {
+          const now = Date.now();
+          const unit = unitSelect.value;
+          const epochValue = unit === "seconds" ? Math.floor(now / 1000) : now;
+          epochInput.value = epochValue;
+          updateOutputs();
+          showMessage("Loaded the current time.");
+        };
+
+        const copyFormattedTime = async () => {
+          const text = selectedZoneOutput.textContent;
+          if (!text || text === "—") {
+            showMessage("Nothing to copy yet — enter an epoch value first.", true);
+            return;
+          }
+
+          try {
+            await navigator.clipboard.writeText(text);
+            showMessage("Formatted time copied to clipboard.");
+          } catch (error) {
+            showMessage("Unable to access the clipboard in this browser.", true);
+          }
+        };
+
+        epochInput.addEventListener("input", updateOutputs);
+        unitSelect.addEventListener("change", () => {
+          const milliseconds = parseEpoch();
+          if (milliseconds === null) {
+            updateOutputs();
+            return;
+          }
+
+          const converted =
+            unitSelect.value === "seconds"
+              ? Math.floor(milliseconds / 1000)
+              : milliseconds;
+          epochInput.value = converted;
+          updateOutputs();
+        });
+        timezoneSelect.addEventListener("change", updateOutputs);
+        nowButton.addEventListener("click", useCurrentTime);
+        copyButton.addEventListener("click", copyFormattedTime);
+      });
+    </script>
+  </body>
+</html>

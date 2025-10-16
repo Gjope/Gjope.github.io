@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>JSON Visualizer</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #020617;
+        color: #e2e8f0;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        background: radial-gradient(circle at top, #0f172a 0%, #020617 70%);
+        padding: 2rem 1.5rem 3rem;
+      }
+
+      main {
+        max-width: 1080px;
+        width: 100%;
+        margin: 0 auto;
+        background: rgba(15, 23, 42, 0.78);
+        border-radius: 22px;
+        box-shadow: 0 30px 70px rgba(15, 23, 42, 0.65);
+        padding: clamp(1.75rem, 4vw, 2.5rem);
+        display: grid;
+        gap: 1.75rem;
+      }
+
+      a.back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        color: #38bdf8;
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      a.back-link:hover {
+        text-decoration: underline;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(2rem, 4vw, 2.6rem);
+      }
+
+      p.description {
+        margin: 0;
+        color: rgba(226, 232, 240, 0.75);
+        line-height: 1.7;
+      }
+
+      .editor {
+        display: grid;
+        gap: 1rem;
+      }
+
+      textarea {
+        width: 100%;
+        min-height: 220px;
+        border-radius: 16px;
+        border: 1px solid rgba(56, 189, 248, 0.35);
+        background: rgba(15, 23, 42, 0.9);
+        color: inherit;
+        font: 500 1rem/1.6 "Fira Code", Consolas, monospace;
+        padding: 1rem 1.2rem;
+        resize: vertical;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      textarea:focus {
+        outline: none;
+        border-color: rgba(56, 189, 248, 0.65);
+        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25);
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+      }
+
+      button {
+        border: none;
+        border-radius: 999px;
+        padding: 0.65rem 1.4rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+      }
+
+      button.primary {
+        background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+        color: white;
+        box-shadow: 0 20px 40px rgba(14, 165, 233, 0.35);
+      }
+
+      button.secondary {
+        background: rgba(148, 163, 184, 0.18);
+        color: #e2e8f0;
+        border: 1px solid rgba(148, 163, 184, 0.25);
+      }
+
+      button:hover {
+        transform: translateY(-1px);
+      }
+
+      .status {
+        min-height: 1.5rem;
+        font-size: 0.95rem;
+        color: #fbbf24;
+      }
+
+      .status.error {
+        color: #f87171;
+      }
+
+      .preview {
+        background: rgba(15, 23, 42, 0.9);
+        border-radius: 18px;
+        border: 1px solid rgba(56, 189, 248, 0.2);
+        padding: 1.25rem;
+        overflow: auto;
+        max-height: 420px;
+      }
+
+      .preview details {
+        padding-left: 1rem;
+      }
+
+      .preview summary {
+        cursor: pointer;
+        font-weight: 600;
+        color: #38bdf8;
+      }
+
+      .preview pre {
+        margin: 0.3rem 0 0;
+        white-space: pre-wrap;
+        word-break: break-word;
+        font: 500 0.95rem/1.6 "Fira Code", Consolas, monospace;
+        color: rgba(226, 232, 240, 0.88);
+      }
+
+      .preview .key {
+        color: #38bdf8;
+      }
+
+      .preview .value.string {
+        color: #22d3ee;
+      }
+
+      .preview .value.number {
+        color: #facc15;
+      }
+
+      .preview .value.boolean {
+        color: #f97316;
+      }
+
+      .preview .value.null {
+        color: #94a3b8;
+      }
+
+      footer {
+        text-align: center;
+        color: rgba(148, 163, 184, 0.75);
+        font-size: 0.9rem;
+      }
+
+      @media (max-width: 640px) {
+        body {
+          padding: 1.5rem;
+        }
+
+        main {
+          border-radius: 18px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <a class="back-link" href="/">← Back to toolbox</a>
+      <div>
+        <h1>JSON Visualizer</h1>
+        <p class="description">
+          Paste or write JSON to inspect its structure. We'll validate the syntax,
+          pretty-print it, and render a collapsible outline so you can explore
+          nested objects without getting lost.
+        </p>
+      </div>
+      <section class="editor" aria-label="JSON input">
+        <textarea
+          id="json-input"
+          placeholder='{"name": "Ada", "languages": ["Go", "TypeScript"]}'
+          aria-describedby="status"
+        ></textarea>
+        <div class="actions">
+          <button type="button" class="primary" id="format">Format JSON</button>
+          <button type="button" class="secondary" id="sample">Insert sample</button>
+          <button type="button" class="secondary" id="clear">Clear</button>
+        </div>
+        <p class="status" id="status" aria-live="polite"></p>
+      </section>
+      <section class="preview" id="preview" aria-label="JSON preview">
+        <p>Waiting for valid JSON…</p>
+      </section>
+      <footer>Pro tip: press Ctrl/⌘ + Enter to format instantly.</footer>
+    </main>
+    <script>
+      const input = document.getElementById("json-input");
+      const status = document.getElementById("status");
+      const preview = document.getElementById("preview");
+      const formatButton = document.getElementById("format");
+      const sampleButton = document.getElementById("sample");
+      const clearButton = document.getElementById("clear");
+
+      const SAMPLE = JSON.stringify(
+        {
+          project: "Gjope Toolbox",
+          features: [
+            { name: "Temperature Converter", focus: "weather" },
+            { name: "JSON Visualizer", focus: "data" },
+          ],
+          meta: {
+            author: "Gjope",
+            version: 1,
+            published: true,
+            tags: ["utilities", "web"],
+          },
+        },
+        null,
+        2
+      );
+
+      const classify = (value) => {
+        const type = typeof value;
+        if (value === null) return "null";
+        if (Array.isArray(value)) return "array";
+        if (type === "string") return "string";
+        if (type === "number") return "number";
+        if (type === "boolean") return "boolean";
+        return "object";
+      };
+
+      const renderValue = (value) => {
+        const type = classify(value);
+        if (type === "object") return renderObject(value);
+        if (type === "array") return renderArray(value);
+        if (type === "string")
+          return `<span class="value string">"${value.replace(/</g, "&lt;")}"</span>`;
+        if (type === "number") return `<span class="value number">${value}</span>`;
+        if (type === "boolean")
+          return `<span class="value boolean">${value}</span>`;
+        if (type === "null") return `<span class="value null">null</span>`;
+        return `<span>${String(value)}</span>`;
+      };
+
+      const renderObject = (obj) => {
+        const entries = Object.entries(obj);
+        if (!entries.length) return `<pre>{ }</pre>`;
+        const details = entries
+          .map(
+            ([key, value]) => `
+              <details open>
+                <summary><span class="key">"${key}"</span></summary>
+                <div>${renderValue(value)}</div>
+              </details>
+            `
+          )
+          .join("");
+        return `<div>${details}</div>`;
+      };
+
+      const renderArray = (arr) => {
+        if (!arr.length) return `<pre>[ ]</pre>`;
+        const details = arr
+          .map(
+            (value, index) => `
+              <details open>
+                <summary><span class="key">[${index}]</span></summary>
+                <div>${renderValue(value)}</div>
+              </details>
+            `
+          )
+          .join("");
+        return `<div>${details}</div>`;
+      };
+
+      const showJSON = (data) => {
+        const html = renderValue(data);
+        preview.innerHTML = html;
+      };
+
+      const showStatus = (message, isError = false) => {
+        status.textContent = message;
+        status.classList.toggle("error", isError);
+      };
+
+      const tryParse = (value) => {
+        if (!value.trim()) {
+          showStatus("Paste JSON above to get started.");
+          preview.innerHTML = "<p>Waiting for valid JSON…</p>";
+          return null;
+        }
+        try {
+          const parsed = JSON.parse(value);
+          showStatus("Valid JSON detected.");
+          return parsed;
+        } catch (error) {
+          showStatus(error.message, true);
+          preview.innerHTML = "<p>Fix the syntax to see a structured preview.</p>";
+          return null;
+        }
+      };
+
+      const format = () => {
+        const parsed = tryParse(input.value);
+        if (!parsed) return;
+        const formatted = JSON.stringify(parsed, null, 2);
+        input.value = formatted;
+        showJSON(parsed);
+      };
+
+      input.addEventListener("input", () => {
+        const parsed = tryParse(input.value);
+        if (parsed) showJSON(parsed);
+      });
+
+      formatButton.addEventListener("click", format);
+      sampleButton.addEventListener("click", () => {
+        input.value = SAMPLE;
+        format();
+      });
+
+      clearButton.addEventListener("click", () => {
+        input.value = "";
+        preview.innerHTML = "<p>Waiting for valid JSON…</p>";
+        showStatus("Cleared.");
+        input.focus();
+      });
+
+      input.addEventListener("keydown", (event) => {
+        if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
+          event.preventDefault();
+          format();
+        }
+      });
+
+      showStatus("Paste JSON above to get started.");
+    </script>
+  </body>
+</html>
